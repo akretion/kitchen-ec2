@@ -168,16 +168,19 @@ module Kitchen
             # overwrite the volume size if it is the root device
             if mapping['DeviceName'] == image.root_device_name
               mapping['Ebs.VolumeSize'] = config[:root_device_size]
+              mapping['Ebs.VolumeType'] = config[:ebs_volume_type] if config[:ebs_volume_type]
             end
             block_device_mapping << mapping
           end
         end
         if config[:ebs_volume_size] && config[:ebs_device_name]
-          block_device_mapping << {
+          new_volume = {
             'Ebs.VolumeSize' => config[:ebs_volume_size],
             'Ebs.DeleteOnTermination' => config[:ebs_delete_on_termination],
             'DeviceName' => config[:ebs_device_name]
           }
+          new_volume['Ebs.VolumeType'] = config[:ebs_volume_type] if config[:ebs_volume_type]
+          block_device_mapping << new_volume
         end
         block_device_mapping
       end
@@ -223,6 +226,7 @@ module Kitchen
         debug("ec2:availability_zone '#{config[:availability_zone]}'")
         debug("ec2:flavor_id '#{config[:flavor_id]}'")
         debug("ec2:ebs_optimized '#{config[:ebs_optimized]}'")
+        debug("ec2:ebs_volume_type '#{config[:ebs_volume_type]}'")
         debug("ec2:image_id '#{config[:image_id]}'")
         debug("ec2:root_device_size '#{config[:root_device_size]}'")
         debug("ec2:security_group_ids '#{config[:security_group_ids]}'")
